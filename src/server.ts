@@ -21,7 +21,7 @@ async function StartServer() {
 }
 (async () => {
     await StartServer()
-    // await seedSuperAdmin()
+    // await seedAdmin()
 })()
 
 process.on('unhandledRejection', error => {
