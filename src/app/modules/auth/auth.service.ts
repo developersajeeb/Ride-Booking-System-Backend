@@ -10,7 +10,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { createNewAccessTokenWithRefreshToken } from "../user/userTokens";
 import AppError from "../../helpers/AppError";
 import { IAuthProvider } from "../user/user.interfaces";
-import { sendEmail } from "../../utils/sendEmail";
+// import { sendEmail } from "../../utils/sendEmail";
 
 const getNewAccessToken = async (refreshToken: string) => {
     const newAccessToken = await createNewAccessTokenWithRefreshToken(refreshToken);
@@ -44,9 +44,9 @@ const forgotPassword = async (email: string) => {
     if (!isUserExist) {
         throw new AppError(httpStatus.BAD_REQUEST, "User does not exist")
     }
-    if (!isUserExist.isVerified) {
-        throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
-    }
+    // if (!isUserExist.isVerified) {
+    //     throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+    // }
     if (isUserExist.isDeleted) {
         throw new AppError(httpStatus.BAD_REQUEST, "User is deleted!")
     }
@@ -63,19 +63,15 @@ const forgotPassword = async (email: string) => {
 
     const resetUILink = `${envVars.FRONTEND_URL}/reset-password?id=${isUserExist._id}&token=${resetToken}`
 
-    sendEmail({
-        to: isUserExist.email,
-        subject: "Password Reset",
-        templateName: "forgetPassword",
-        templateData: {
-            name: isUserExist.name,
-            resetUILink
-        }
-    })
-
-    /**
-     * http://localhost:5173/reset-password?id=687f310c724151eb2fcf0c41&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODdmMzEwYzcyNDE1MWViMmZjZjBjNDEiLCJlbWFpbCI6InNhbWluaXNyYXI2QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzUzMTY2MTM3LCJleHAiOjE3NTMxNjY3Mzd9.LQgXBmyBpEPpAQyPjDNPL4m2xLF4XomfUPfoxeG0MKg
-     */
+    // sendEmail({
+    //     to: isUserExist.email,
+    //     subject: "Password Reset",
+    //     templateName: "forgetPassword",
+    //     templateData: {
+    //         name: isUserExist.name,
+    //         resetUILink
+    //     }
+    // })
 }
 
 const setPassword = async (userId: string, plainPassword: string) => {
@@ -85,9 +81,9 @@ const setPassword = async (userId: string, plainPassword: string) => {
         throw new AppError(404, "User not found");
     }
 
-    if (user.password && user.auths.some(providerObject => providerObject.provider === "google")) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You have already set you password. Now you can change the password from your profile password update")
-    }
+    // if (user.password && user.auths.some(providerObject => providerObject.provider === "google")) {
+    //     throw new AppError(httpStatus.BAD_REQUEST, "You have already set you password. Now you can change the password from your profile password update")
+    // }
 
     const hashedPassword = await bcryptjs.hash(
         plainPassword,

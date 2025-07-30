@@ -33,8 +33,8 @@ const userSchema = new Schema<IUser>(
 
     role: {
       type: String,
-      enum: ['admin', 'rider'],
-      default: 'rider',
+      enum: ['ADMIN', 'RIDER', 'DRIVER'],
+      default: 'RIDER',
     },
 
     isBlocked: {
@@ -42,7 +42,7 @@ const userSchema = new Schema<IUser>(
       default: false,
     },
 
-    isVerified: { type: Boolean, default: false },
+    // isVerified: { type: Boolean, default: false },
 
     isDeleted: { type: Boolean, default: false },
     

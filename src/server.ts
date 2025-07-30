@@ -3,6 +3,7 @@ import { Server } from 'http';
 import mongoose from 'mongoose';
 import app from './app';
 import { envVars } from './app/config/env';
+import { seedAdmin } from './app/utils/seedAdmin';
 
 let server: Server;
 
@@ -21,7 +22,7 @@ async function StartServer() {
 }
 (async () => {
     await StartServer()
-    // await seedAdmin()
+    await seedAdmin()
 })()
 
 process.on('unhandledRejection', error => {

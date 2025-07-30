@@ -3,8 +3,6 @@ import httpStatus from "http-status-codes";
 // import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 import { IAuthProvider, IUser } from "./user.interfaces";
-// import { QueryBuilder } from "../../utils/QueryBuilder";
-// import { userSearchableFields } from "./user.constant";
 import { User } from "./user.model";
 import AppError from "../../helpers/AppError";
 import { QueryBuilder } from "../../utils/QueryBuilder";
@@ -81,12 +79,12 @@ const getAllUsers = async (query: Record<string, string>) => {
     }
 };
 
-// const getSingleUser = async (id: string) => {
-//     const user = await User.findById(id).select("-password");
-//     return {
-//         data: user
-//     }
-// };
+const getSingleUser = async (id: string) => {
+    const user = await User.findById(id).select("-password");
+    return {
+        data: user
+    }
+};
 
 // const getMe = async (userId: string) => {
 //     const user = await User.findById(userId).select("-password");
@@ -98,7 +96,7 @@ const getAllUsers = async (query: Record<string, string>) => {
 export const UserServices = {
     createUser,
     getAllUsers,
-    // getSingleUser,
+    getSingleUser,
     // updateUser,
     // getMe
 }
