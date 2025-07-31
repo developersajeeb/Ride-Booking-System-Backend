@@ -9,7 +9,7 @@ import { envVars } from "../../config/env";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { createNewAccessTokenWithRefreshToken } from "../user/userTokens";
 import AppError from "../../helpers/AppError";
-import { IAuthProvider } from "../user/user.interfaces";
+import { IAuthProvider } from "../../interfaces/common";
 // import { sendEmail } from "../../utils/sendEmail";
 
 const getNewAccessToken = async (refreshToken: string) => {

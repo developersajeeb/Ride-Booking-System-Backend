@@ -1,0 +1,43 @@
+import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
+import { generateToken, verifyToken } from "../../utils/jwt";
+import { envVars } from "../../config/env";
+import AppError from "../../helpers/AppError";
+import { IDriver } from "./driver.interfaces";
+import { Driver } from "./driver.model";
+
+export const createDriverUserTokens = (user: Partial<IDriver>) => {
+    const jwtPayload = {
+        userId: user.id,
+        email: user.email,
+        role: user.role
+    }
+    const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES)
+    const refreshToken = generateToken(jwtPayload, envVars.JWT_REFRESH_SECRET, envVars.JWT_REFRESH_EXPIRES)
+
+    return {
+        accessToken,
+        refreshToken
+    }
+}
+
+export const createDriverNewAccessTokenWithRefreshToken = async (refreshToken: string) => {
+    const verifiedRefreshToken = verifyToken(refreshToken, envVars.JWT_REFRESH_SECRET) as JwtPayload
+    const isUserExist = await Driver.findOne({ email: verifiedRefreshToken.email })
+
+    if (!isUserExist) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Driver does not exist!")
+    }
+    if (isUserExist.isDeleted) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Driver is deleted!")
+    }
+
+    const jwtPayload = {
+        userId: isUserExist._id,
+        email: isUserExist.email,
+        role: isUserExist.role
+    }
+    const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES)
+
+    return accessToken
+}

@@ -1,7 +1,7 @@
-import { OnlineStatus, Role } from "../../interfaces/common";
-import { IAuthProvider } from "../user/user.interfaces";
+import { IAuthProvider, OnlineStatus, Role } from "../../interfaces/common";
 
 export interface IDriver {
+  id: string;
   name: string;
   email: string;
   password: string;
@@ -10,6 +10,7 @@ export interface IDriver {
   vehicleNumber: string;
   licenseNumber: string;
   role?: Role.DRIVER; 
+  earnings: number;
   isApproved?: boolean;
   isDeleted?: string;
   isBlocked?: boolean;

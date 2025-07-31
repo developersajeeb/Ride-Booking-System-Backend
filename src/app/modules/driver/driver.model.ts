@@ -1,8 +1,8 @@
 // src/app/modules/driver/driver.model.ts
 
 import { Schema, model } from 'mongoose';
-import { IAuthProvider } from '../user/user.interfaces';
 import { IDriver } from './driver.interfaces';
+import { IAuthProvider } from '../../interfaces/common';
 
 const authProviderSchema = new Schema<IAuthProvider>(
   {

@@ -1,13 +1,8 @@
-import { Role } from "../../interfaces/common";
-
-export interface IAuthProvider {
-    // provider: "google" | "credentials";
-    provider: "credentials";
-    providerId: string;
-}
+import { IAuthProvider, Role } from "../../interfaces/common";
 
 export interface IUser {
   _id?: string;
+  userId: string;
   name: string;
   email: string;
   password: string;

@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { IAuthProvider, IUser } from './user.interfaces';
+import { IAuthProvider } from '../../interfaces/common';
+import { IUser } from './user.interfaces';
 
 const authProviderSchema = new Schema<IAuthProvider>({
     provider: { type: String, required: true },
