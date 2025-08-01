@@ -3,11 +3,11 @@ import { IAuthProvider } from '../../interfaces/common';
 import { IUser } from './user.interfaces';
 
 const authProviderSchema = new Schema<IAuthProvider>({
-    provider: { type: String, required: true },
-    providerId: { type: String, required: true }
+  provider: { type: String, required: true },
+  providerId: { type: String, required: true }
 }, {
-    versionKey: false,
-    _id: false
+  versionKey: false,
+  _id: false
 })
 
 const userSchema = new Schema<IUser>(
@@ -43,10 +43,46 @@ const userSchema = new Schema<IUser>(
       default: false,
     },
 
-    // isVerified: { type: Boolean, default: false },
-
     isDeleted: { type: Boolean, default: false },
+
+    phone: {
+      type: String,
+      required: false,
+      match: /^(?:\+8801\d{9}|01\d{9})$/,
+    },
+
+    vehicleType: {
+      type: String,
+      required: false,
+      enum: ['BIKE', 'CAR', 'OTHER'],
+    },
+
+    vehicleNumber: {
+      type: String,
+      required: false,
+    },
+
+    licenseNumber: {
+      type: String,
+      required: false,
+    },
+
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
     
+    isAvailable: {
+      type: Boolean,
+      default: false,
+    },
+
+    onlineStatus: {
+      type: String,
+      enum: ['online', 'offline'],
+      default: 'offline',
+    },
+
     auths: [authProviderSchema],
   },
   {

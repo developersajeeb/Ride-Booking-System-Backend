@@ -5,16 +5,27 @@ import httpStatus from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
 import { UserServices } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
+import { createUserTokens } from "./userTokens";
+import { setAuthCookie } from "../../utils/setCookie";
 
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const user = await UserServices.createUser(req.body)
+  const user = await UserServices.createUser(req.body);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.CREATED,
-        message: "User Created Successfully",
-        data: user,
-    })
+  const tokens = createUserTokens(user);
+  const { password, ...rest } = user.toObject();
+
+  setAuthCookie(res, tokens);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "User created successfully",
+    data: {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: rest,
+    },
+  });
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

@@ -3,55 +3,30 @@ import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status-codes';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
-import { DriverServices } from './driver.service';
 import { JwtPayload } from 'jsonwebtoken';
+import { DriverServices } from './driver.service';
+import { createUserTokens } from '../user/userTokens';
+import { setAuthCookie } from '../../utils/setCookie';
+import { User } from '../user/user.model';
+import AppError from '../../helpers/AppError';
 
-const registerDriver = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const driver = await DriverServices.registerDriver(req.body);
+const registerDriver = catchAsync(async (req: Request, res: Response) => {
+  const user = await DriverServices.createDriver(req.body);
+
+  const tokens = createUserTokens(user);
+  const { password, ...rest } = user.toObject();
+
+  setAuthCookie(res, tokens);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: 'Driver registered successfully',
-    data: driver,
-  });
-});
-
-const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
-  const query = req.query;
-  const result = await DriverServices.getAllDrivers(query as Record<string, string>);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'All drivers retrieved successfully',
-    data: result.data,
-    meta: result.meta,
-  });
-});
-
-const getSingleDriver = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const result = await DriverServices.getSingleDriver(id);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'Driver retrieved successfully',
-    data: result,
-  });
-});
-
-const updateAvailabilityStatus = catchAsync(async (req, res: Response) => {
-  const driverId = req.user as JwtPayload;
-  const { status } = req.body;
-  const result = await DriverServices.updateAvailability(driverId.id, status);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'Availability status updated',
-    data: result,
+    message: "Driver registered successfully",
+    data: {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: rest,
+    },
   });
 });
 
@@ -79,24 +54,8 @@ const approveDriver = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const blockDriver = catchAsync(async (req: Request, res: Response) => {
-  const driverId = req.params.id;
-  const result = await DriverServices.blockDriver(driverId);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'Driver block/unblock status updated',
-    data: result,
-  });
-});
-
 export const DriverControllers = {
   registerDriver,
-  getAllDrivers,
-  getSingleDriver,
-  updateAvailabilityStatus,
   getEarningsHistory,
   approveDriver,
-  blockDriver,
 };

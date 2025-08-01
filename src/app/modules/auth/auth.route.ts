@@ -6,7 +6,6 @@ import { Router } from "express";
 const router = Router()
 
 router.post("/login", AuthControllers.credentialsLogin);
-router.post("/driver/login", AuthControllers.credentialsDriverLogin);
 router.post("/refresh-token", AuthControllers.getNewAccessToken);
 router.post("/logout", AuthControllers.logout);
 router.post("/change-password", checkAuth(...Object.values(Role)), AuthControllers.changePassword)

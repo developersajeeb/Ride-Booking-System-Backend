@@ -3,57 +3,35 @@
 import bcryptjs from 'bcryptjs';
 import httpStatus from 'http-status-codes';
 import AppError from '../../helpers/AppError';
-import { envVars } from '../../config/env';
 import { Driver } from './driver.model';
-import { QueryBuilder } from '../../utils/QueryBuilder';
-import { IDriver } from './driver.interfaces';
+import { User } from '../user/user.model';
+import { envVars } from '../../config/env';
+import { IAuthProvider } from '../../interfaces/common';
+import { IUser } from '../user/user.interfaces';
 
-const registerDriver = async (payload: Partial<IDriver>) => {
-  const { email, password } = payload;
+const createDriver = async (payload: Partial<IUser>) => {
+  const { email, password, vehicleType, vehicleNumber, licenseNumber, ...rest } = payload;
 
-  const existingDriver = await Driver.findOne({ email });
-  if (existingDriver) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Driver already exists');
+  const isUserExist = await User.findOne({ email });
+  if (isUserExist) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User already exists");
   }
 
   const hashedPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUND));
-  const newDriver = await Driver.create({
-    ...payload,
+  const authProvider: IAuthProvider = { provider: "credentials", providerId: email as string };
+
+  const user = await User.create({
+    email,
     password: hashedPassword,
-    role: 'DRIVER',
-    isApproved: false,
-    onlineStatus: 'offline',
-    earnings: [],
+    role: "DRIVER",
+    vehicleType,
+    vehicleNumber,
+    licenseNumber,
+    auths: [authProvider],
+    ...rest,
   });
 
-  return newDriver;
-};
-
-const getAllDrivers = async (query: Record<string, string>) => {
-  const queryBuilder = new QueryBuilder(Driver.find(), query);
-
-  const driversData = queryBuilder
-    .filter()
-    .search(['name', 'email', 'vehicleType', 'vehicleNumber'])
-    .sort()
-    .fields()
-    .paginate();
-
-  const [data, meta] = await Promise.all([
-    driversData.build(),
-    queryBuilder.getMeta(),
-  ]);
-
-  return { data, meta };
-};
-
-const getSingleDriver = async (id: string) => {
-  const driver = await Driver.findById(id).select('-password');
-  if (!driver) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
-  }
-
-  return driver;
+  return user;
 };
 
 const updateAvailability = async (driverId: string, status: 'online' | 'offline') => {
@@ -78,7 +56,8 @@ const getEarnings = async (driverId: string) => {
 };
 
 const approveDriver = async (driverId: string) => {
-  const driver = await Driver.findById(driverId);
+  const driver = await User.findOne({ _id: driverId, role: 'DRIVER' });
+
   if (!driver) {
     throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
   }
@@ -89,24 +68,9 @@ const approveDriver = async (driverId: string) => {
   return driver;
 };
 
-const blockDriver = async (driverId: string) => {
-  const driver = await Driver.findById(driverId);
-  if (!driver) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
-  }
-
-  driver.isBlocked = !driver.isBlocked;
-  await driver.save();
-
-  return driver;
-};
-
 export const DriverServices = {
-  registerDriver,
-  getAllDrivers,
-  getSingleDriver,
+  createDriver,
   updateAvailability,
   getEarnings,
   approveDriver,
-  blockDriver,
 };

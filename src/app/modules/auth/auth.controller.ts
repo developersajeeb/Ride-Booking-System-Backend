@@ -6,12 +6,11 @@ import { catchAsync } from "../../utils/catchAsync"
 import { sendResponse } from "../../utils/sendResponse"
 import { AuthServices } from "./auth.service"
 import { JwtPayload } from "jsonwebtoken"
-import { envVars } from "../../config/env"
 import passport from "passport"
 import AppError from "../../helpers/AppError"
 import { createUserTokens } from "../user/userTokens"
 import { setAuthCookie } from "../../utils/setCookie"
-import { createDriverUserTokens } from "../driver/driverTokens"
+import { User } from "../user/user.model"
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate("local", async (err: any, user: any, info: any) => {
@@ -23,37 +22,12 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
         if (!user) {
             return next(new AppError(401, info.message))
         }
+
+        if (user.role === "DRIVER") {
+            await User.findOneAndUpdate({ email: user.email }, { onlineStatus: "online" });
+        }
         const userTokens = await createUserTokens(user)
         const { password: pass, ...rest } = user.toObject()
-
-        setAuthCookie(res, userTokens)
-
-        sendResponse(res, {
-            success: true,
-            statusCode: httpStatus.OK,
-            message: "Logged In Successfully",
-            data: {
-                accessToken: userTokens.accessToken,
-                refreshToken: userTokens.refreshToken,
-                user: rest
-
-            },
-        })
-    })(req, res, next)
-});
-
-const credentialsDriverLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate("local", async (err: any, driver: any, info: any) => {
-
-        if (err) {
-            return next(new AppError(401, err))
-        }
-
-        if (!driver) {
-            return next(new AppError(401, info.message))
-        }
-        const userTokens = await createDriverUserTokens(driver)
-        const { password: pass, ...rest } = driver.toObject()
 
         setAuthCookie(res, userTokens)
 
@@ -186,7 +160,6 @@ const forgotPassword = catchAsync(async (req: Request, res: Response, next: Next
 
 export const AuthControllers = {
     credentialsLogin,
-    credentialsDriverLogin,
     getNewAccessToken,
     changePassword,
     setPassword,
