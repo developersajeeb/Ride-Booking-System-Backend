@@ -1,0 +1,1 @@
+export const rideSearchableFields = ['pickupLocation', 'destination', 'status', 'driverEmail', 'driverPhone', 'riderEmail', 'riderPhone'];

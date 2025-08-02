@@ -5,7 +5,7 @@ import { Types } from 'mongoose';
 export type RideStatus =
   | 'REQUESTED'
   | 'ACCEPTED'
-  | 'PICKEd_UP'
+  | 'PICKED_UP'
   | 'IN_TRANSIT'
   | 'COMPLETED'
   | 'CANCELLED'
@@ -13,10 +13,16 @@ export type RideStatus =
 
 export interface IRide {
   rider: Types.ObjectId;
-  driver?: Types.ObjectId;
+  riderName: string;
+  riderEmail: string;
+  riderPhone?: string;
   pickupLocation: string;  
   destination: string;
   status: RideStatus;
+  driver?: Types.ObjectId;
+  driverName?: string;
+  driverEmail?: string;
+  driverPhone?: string;
   fare?: number;
   requestedAt: Date;
   acceptedAt?: Date;

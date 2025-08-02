@@ -1,5 +1,3 @@
-// src/app/modules/driver/driver.route.ts
-
 import { Router } from 'express';
 import { validateRequest } from '../../middlewares/validateRequest';
 import { checkAuth } from '../../middlewares/checkAuth';

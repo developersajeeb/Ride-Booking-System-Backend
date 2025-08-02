@@ -6,7 +6,7 @@ import { IRide } from './rider.interface';
 const rideStatuses = [
     'REQUESTED',
     'ACCEPTED',
-    'PICKEd_UP',
+    'PICKED_UP',
     'IN_TRANSIT',
     'COMPLETED',
     'CANCELLED',
@@ -20,22 +20,42 @@ const rideSchema = new Schema<IRide>(
             ref: 'User',
             required: true,
         },
-
+        riderName: {
+            type: String,
+            required: true,
+        },
+        riderEmail: {
+            type: String,
+            required: true,
+        },
+        riderPhone: {
+            type: String,
+            required: false,
+        },
         driver: {
             type: Schema.Types.ObjectId,
             ref: 'Driver',
         },
-
+        driverName: {
+            type: String,
+            required: false,
+        },
+        driverEmail: {
+            type: String,
+            required: false,
+        },
+        driverPhone: {
+            type: String,
+            required: false,
+        },
         pickupLocation: {
             type: String,
             required: true,
         },
-
         destination: {
             type: String,
             required: true,
         },
-
         status: {
             type: String,
             enum: rideStatuses,
@@ -50,7 +70,7 @@ const rideSchema = new Schema<IRide>(
         completedAt: { type: Date },
         cancelledAt: { type: Date },
 
-        distanceInKm: { type: Number },
+        distanceInKm: { type: Number, required: true },
     },
     {
         timestamps: true,
