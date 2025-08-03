@@ -15,7 +15,7 @@ interface EnvConfig {
     // GOOGLE_CLIENT_SECRET: string
     // GOOGLE_CLIENT_ID: string
     // GOOGLE_CALLBACK_URL: string
-    // EXPRESS_SESSION_SECRET: string
+    EXPRESS_SESSION_SECRET: string
     FRONTEND_URL: string
     // EMAIL_SENDER: {
     //     SMTP_USER: string;
@@ -49,7 +49,7 @@ const loadEnvVariables = (): EnvConfig => {
         // GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
         // GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
         // GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
-        // EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
+        EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
         FRONTEND_URL: process.env.FRONTEND_URL as string,
         // EMAIL_SENDER: {
         //     SMTP_USER: process.env.SMTP_USER as string,
