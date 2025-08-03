@@ -28,8 +28,8 @@ export const seedAdmin = async () => {
             email: envVars.ADMIN_EMAIL,
             password: hashedPassword,
             isVerified: true,
-            auths: [authProvider]
-
+            auths: [authProvider],
+            userId: ""
         }
 
         const superadmin = await User.create(payload)

@@ -52,6 +52,10 @@ A secure, scalable, and role-based **Ride Booking System** backend built using *
 
 ## 📦 API Endpoints Summary
 
+### Needed Credential
+- admin@gmail.com
+- 123456
+
 ### 🔑 Auth Routes
 
 | Method | Endpoint | Description |
