@@ -12,10 +12,10 @@ interface EnvConfig {
     JWT_REFRESH_EXPIRES: string
     ADMIN_EMAIL: string
     ADMIN_PASSWORD: string
-    GOOGLE_CLIENT_SECRET: string
-    GOOGLE_CLIENT_ID: string
-    GOOGLE_CALLBACK_URL: string
-    EXPRESS_SESSION_SECRET: string
+    // GOOGLE_CLIENT_SECRET: string
+    // GOOGLE_CLIENT_ID: string
+    // GOOGLE_CALLBACK_URL: string
+    // EXPRESS_SESSION_SECRET: string
     FRONTEND_URL: string
     // EMAIL_SENDER: {
     //     SMTP_USER: string;
@@ -46,10 +46,10 @@ const loadEnvVariables = (): EnvConfig => {
         JWT_REFRESH_EXPIRES: process.env.JWT_ACCESS_EXPIRES as string,
         ADMIN_EMAIL: process.env.ADMIN_EMAIL as string,
         ADMIN_PASSWORD: process.env.ADMIN_PASSWORD as string,
-        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
-        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
-        GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
-        EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
+        // GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
+        // GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+        // GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
+        // EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
         FRONTEND_URL: process.env.FRONTEND_URL as string,
         // EMAIL_SENDER: {
         //     SMTP_USER: process.env.SMTP_USER as string,
