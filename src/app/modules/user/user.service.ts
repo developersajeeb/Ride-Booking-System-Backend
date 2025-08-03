@@ -57,6 +57,18 @@ const getSingleUser = async (id: string) => {
     }
 };
 
+const blockUnblockUser = async (userId: string, isBlocked: boolean) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  user.isBlocked = isBlocked;
+  await user.save();
+
+  return user;
+};
+
 // const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload) => {
 //     const ifUserExist = await User.findById(userId);
 
@@ -90,4 +102,5 @@ export const UserServices = {
     createUser,
     getAllUsers,
     getSingleUser,
+    blockUnblockUser,
 }

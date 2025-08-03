@@ -75,17 +75,47 @@ const getAllRides = async (query: Record<string, string>) => {
     queryBuilder.getMeta(),
   ]);
 
-  return { data, meta };
+  return { meta, data };
 };
 
-const getDriverRideHistory = async (driverId: string) => {
-  const rides = await Ride.find({ driver: driverId }).sort({ createdAt: -1 });
-  return rides;
+const getDriverRideHistory = async (
+  driverId: string,
+  query: Record<string, string>
+) => {
+  const extendedQuery = { ...query, driver: driverId };
+  const queryBuilder = new QueryBuilder(Ride.find(), extendedQuery);
+  const ridesQuery = queryBuilder
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
+
+  const [data, meta] = await Promise.all([
+    ridesQuery.build(),
+    queryBuilder.getMeta(),
+  ]);
+
+  return { meta, data };
 };
 
-const getRiderRideHistory = async (userId: string) => {
-  const rides = await Ride.find({ rider: userId }).sort({ createdAt: -1 });
-  return rides;
+const getRiderRideHistory = async (
+  riderId: string,
+  query: Record<string, string>
+) => {
+  const extendedQuery = { ...query, rider: riderId };
+  const queryBuilder = new QueryBuilder(Ride.find(), extendedQuery);
+  const ridesQuery = queryBuilder
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
+
+  const [data, meta] = await Promise.all([
+    ridesQuery.build(),
+    queryBuilder.getMeta(),
+  ]);
+
+  return { meta, data };
 };
 
 const respondToRideRequest = async (driverId: string, rideId: string, response: 'ACCEPTED' | 'REJECTED') => {

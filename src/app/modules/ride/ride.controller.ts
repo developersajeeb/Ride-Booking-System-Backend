@@ -34,7 +34,10 @@ const cancelRide = catchAsync(async (req: Request, res: Response) => {
 
 const getDriverRideHistory = catchAsync(async (req: Request, res: Response) => {
   const user = req.user as JwtPayload;
-  const history = await RideServices.getDriverRideHistory(user.userId);
+  const history = await RideServices.getDriverRideHistory(
+    user.userId,
+    req.query as Record<string, string>
+  );
 
   sendResponse(res, {
     success: true,
@@ -46,7 +49,10 @@ const getDriverRideHistory = catchAsync(async (req: Request, res: Response) => {
 
 const getRiderRideHistory = catchAsync(async (req: Request, res: Response) => {
   const user = req.user as JwtPayload;
-  const history = await RideServices.getRiderRideHistory(user.userId);
+  const history = await RideServices.getRiderRideHistory(
+    user.userId,
+    req.query as Record<string, string>
+  );
 
   sendResponse(res, {
     success: true,

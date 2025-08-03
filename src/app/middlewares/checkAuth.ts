@@ -12,7 +12,7 @@ export const checkAuth = (...authRoles: string[]) => async (req: Request, res: R
         const accessToken = req.headers.authorization;
 
         if (!accessToken) {
-            throw new AppError(403, "No Token Recieved")
+            throw new AppError(403, "No Token Received")
         }
 
         const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload
@@ -24,6 +24,9 @@ export const checkAuth = (...authRoles: string[]) => async (req: Request, res: R
         // if (!isUserExist.isVerified) {
         //     throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
         // }
+        if (!isUserExist.isApproved && isUserExist.role !== 'ADMIN' && isUserExist.role !== 'RIDER') {
+            throw new AppError(httpStatus.FORBIDDEN, 'Your account is not approved yet. Please wait for admin approval.');
+        }
         if (isUserExist.isDeleted) {
             throw new AppError(httpStatus.BAD_REQUEST, "User is deleted!")
         }

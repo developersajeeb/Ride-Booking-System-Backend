@@ -1,13 +1,11 @@
-// src/app/modules/driver/driver.service.ts
-
 import bcryptjs from 'bcryptjs';
 import httpStatus from 'http-status-codes';
 import AppError from '../../helpers/AppError';
-import { Driver } from './driver.model';
 import { User } from '../user/user.model';
 import { envVars } from '../../config/env';
 import { IAuthProvider } from '../../interfaces/common';
 import { IUser } from '../user/user.interfaces';
+import { Ride } from '../ride/ride.model';
 
 const createDriver = async (payload: Partial<IUser>) => {
   const { email, password, vehicleType, vehicleNumber, licenseNumber, ...rest } = payload;
@@ -34,25 +32,23 @@ const createDriver = async (payload: Partial<IUser>) => {
   return user;
 };
 
-const updateAvailability = async (driverId: string, status: 'online' | 'offline') => {
-  const driver = await Driver.findById(driverId);
-  if (!driver) {
+const getTotalEarningsRide = async (driverId: string) => {
+  
+  if (!driverId) {
     throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
   }
+  const rides = await Ride.find({ driver: driverId, status: 'COMPLETED' });
+  const totalEarnings = rides.reduce(
+    (acc: number, ride) => acc + (ride.fare || 0),
+    0
+  );
 
-  driver.onlineStatus = status;
-  await driver.save();
+  const totalRides = rides.length;
 
-  return driver;
-};
-
-const getEarnings = async (driverId: string) => {
-  const driver = await Driver.findById(driverId);
-  if (!driver) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
-  }
-
-  return driver.earnings || [];
+  return {
+    totalEarnings,
+    totalRides,
+  };
 };
 
 const approveDriver = async (driverId: string) => {
@@ -68,9 +64,22 @@ const approveDriver = async (driverId: string) => {
   return driver;
 };
 
+const suspendDriver = async (driverId: string) => {
+  const driver = await User.findOne({ _id: driverId, role: 'DRIVER' });
+
+  if (!driver) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
+  }
+
+  driver.isApproved = false;
+  await driver.save();
+
+  return driver;
+};
+
 export const DriverServices = {
   createDriver,
-  updateAvailability,
-  getEarnings,
+  getTotalEarningsRide,
   approveDriver,
+  suspendDriver
 };
