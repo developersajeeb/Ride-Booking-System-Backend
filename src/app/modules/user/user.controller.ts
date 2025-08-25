@@ -7,6 +7,7 @@ import { UserServices } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
 import { createUserTokens } from "./userTokens";
 import { setAuthCookie } from "../../utils/setCookie";
+import { JwtPayload } from "jsonwebtoken";
 
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const user = await UserServices.createUser(req.body);
@@ -26,6 +27,18 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
       user: rest,
     },
   });
+});
+
+const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload
+    const result = await UserServices.getMe(decodedToken.userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Your profile Retrieved Successfully",
+        data: result.data
+    })
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -83,6 +96,7 @@ const blockUnblockUser = catchAsync(async (req: Request, res: Response) => {
 
 export const UserControllers = {
     createUser,
+    getMe,
     getAllUsers,
     getSingleUser,
     blockUnblockUser
