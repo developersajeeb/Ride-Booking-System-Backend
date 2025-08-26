@@ -1,99 +1,61 @@
 import z from "zod";
 
 export const createUserZodSchema = z.object({
-  name: z
-    .string({ invalid_type_error: 'Name must be string' })
-    .min(2, { message: 'Name must be at least 2 characters long.' })
-    .max(100, { message: 'Name cannot exceed 100 characters.' }),
-
-  email: z
-    .string({ invalid_type_error: 'Email must be string' })
-    .email({ message: 'Invalid email address format.' })
-    .min(5, { message: 'Email must be at least 5 characters long.' })
-    .max(100, { message: 'Email cannot exceed 100 characters.' }),
-
+  name: z.string().min(2).max(100),
+  email: z.string().email().min(5).max(100),
   password: z
-    .string({ invalid_type_error: 'Password must be string' })
-    .min(6, { message: 'Password must be at least 6 characters long.' })
-    .regex(/(?=.*[A-Z])/, {
-      message: 'Password must contain at least 1 uppercase letter.',
-    })
-    .regex(/(?=.*[!@#$%^&*])/, {
-      message: 'Password must contain at least 1 special character.',
-    })
-    .regex(/(?=.*\d)/, {
-      message: 'Password must contain at least 1 number.',
-    }),
-});
-
-export const updateUserZodSchema = z.object({
-  name: z
-    .string({ invalid_type_error: 'Name must be string' })
-    .min(2, { message: 'Name must be at least 2 characters long.' })
-    .max(50, { message: 'Name cannot exceed 50 characters.' })
-    .optional(),
-
-  password: z
-    .string({ invalid_type_error: 'Password must be string' })
-    .min(6, { message: 'Password must be at least 6 characters long.' })
-    .regex(/(?=.*[A-Z])/, {
-      message: 'Password must contain at least 1 uppercase letter.',
-    })
-    .regex(/(?=.*[!@#$%^&*])/, {
-      message: 'Password must contain at least 1 special character.',
-    })
-    .regex(/(?=.*\d)/, {
-      message: 'Password must contain at least 1 number.',
-    })
-    .optional(),
-
-  role: z.enum(['admin', 'rider']).optional(),
-
-  isBlocked: z
-    .boolean({ invalid_type_error: 'isBlocked must be true or false' })
-    .optional(),
-});
-
-export const createDriverZodSchema = z.object({
-  name: z
-    .string({ invalid_type_error: 'Name must be string' })
-    .min(2, { message: 'Name must be at least 2 characters long.' })
-    .max(100, { message: 'Name cannot exceed 100 characters.' }),
-
-  email: z
-    .string({ invalid_type_error: 'Email must be string' })
-    .email({ message: 'Invalid email address format.' })
-    .min(5, { message: 'Email must be at least 5 characters long.' })
-    .max(100, { message: 'Email cannot exceed 100 characters.' }),
-
-  password: z
-    .string({ invalid_type_error: 'Password must be string' })
-    .min(6, { message: 'Password must be at least 6 characters long.' })
-    .regex(/(?=.*[A-Z])/, {
-      message: 'Password must contain at least 1 uppercase letter.',
-    })
-    .regex(/(?=.*[!@#$%^&*])/, {
-      message: 'Password must contain at least 1 special character.',
-    })
-    .regex(/(?=.*\d)/, {
-      message: 'Password must contain at least 1 number.',
-    }),
-
-  phone: z
-    .string({ invalid_type_error: 'Phone must be string' })
+    .string()
+    .min(6)
+    .regex(/(?=.*[A-Z])/)
+    .regex(/(?=.*[!@#$%^&*])/)
+    .regex(/(?=.*\d)/),
+  role: z.enum(["RIDER", "DRIVER"]),
+  phone: z.string()
     .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
       message: 'Phone number must be valid for Bangladesh (01XXXXXXXXX)',
-    }),
+    })
+    .optional(),
+  vehicleType: z.enum(["BIKE", "CAR", "OTHER"]).optional(),
+  vehicleNumber: z.string().min(4).optional(),
+  licenseNumber: z.string().min(4).optional(),
+}).refine(
+  (data) => {
+    if (data.role === "DRIVER") {
+      return data.phone && data.vehicleType && data.vehicleNumber && data.licenseNumber;
+    }
+    return true;
+  },
+  {
+    message: "Driver registration requires phone, vehicleType, vehicleNumber, and licenseNumber",
+    path: ["role"],
+  }
+);
 
-  vehicleType: z.enum(['BIKE', 'CAR', 'OTHER'], {
-    required_error: 'Vehicle type is required and must be Bike, Car, or Other.',
-  }),
-
-  vehicleNumber: z
-    .string({ invalid_type_error: 'Vehicle number must be string' })
-    .min(4, { message: 'Vehicle number must be at least 4 characters.' }),
-
-  licenseNumber: z
-    .string({ invalid_type_error: 'License number must be string' })
-    .min(4, { message: 'License number must be at least 4 characters.' }),
-});
+export const updateUserZodSchema = z.object({
+  name: z.string().min(2).max(100).optional(),
+  password: z
+    .string()
+    .min(6)
+    .regex(/(?=.*[A-Z])/)
+    .regex(/(?=.*[!@#$%^&*])/)
+    .regex(/(?=.*\d)/)
+    .optional(),
+  role: z.enum(["RIDER", "DRIVER"]).optional(),
+  phone: z.string()
+    .regex(/^(?:\+8801\d{9}|01\d{9})$/, { message: 'Phone number must be valid for Bangladesh' })
+    .optional(),
+  vehicleType: z.enum(["BIKE", "CAR", "OTHER"]).optional(),
+  vehicleNumber: z.string().min(4).optional(),
+  licenseNumber: z.string().min(4).optional(),
+}).refine(
+  (data) => {
+    if (data.role === "DRIVER") {
+      return data.phone && data.vehicleType && data.vehicleNumber && data.licenseNumber;
+    }
+    return true;
+  },
+  {
+    message: "Driver update requires phone, vehicleType, vehicleNumber, and licenseNumber",
+    path: ["role"],
+  }
+);

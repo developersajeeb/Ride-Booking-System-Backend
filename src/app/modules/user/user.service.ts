@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import bcryptjs from "bcryptjs";
 import httpStatus from "http-status-codes";
 // import { JwtPayload } from "jsonwebtoken";
@@ -10,25 +11,34 @@ import { userSearchableFields } from "./user.constant";
 import { IAuthProvider } from "../../interfaces/common";
 
 const createUser = async (payload: Partial<IUser>) => {
-    const { email, password, ...rest } = payload;
-    const isUserExist = await User.findOne({ email })
+  const { email, password, role, phone, vehicleType, vehicleNumber, licenseNumber, ...rest } = payload;
+  const isUserExist = await User.findOne({ email });
 
-    if (isUserExist) {
-        throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist")
-    }
+  if (isUserExist) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User already exists");
+  }
 
-    const hashedPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUND))
-    const authProvider: IAuthProvider = { provider: "credentials", providerId: email as string }
-    const user = await User.create({
-        email,
-        password: hashedPassword,
-        auths: [authProvider],
-        ...rest
-    })
+  const hashedPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUND));
+  const authProvider: IAuthProvider = { provider: "credentials", providerId: email as string };
 
-    return user
+  const userData: any = {
+    email,
+    password: hashedPassword,
+    role: role || "RIDER",
+    auths: [authProvider],
+    ...rest,
+  };
 
-}
+  if (role === "DRIVER") {
+    userData.phone = phone;
+    userData.vehicleType = vehicleType;
+    userData.vehicleNumber = vehicleNumber;
+    userData.licenseNumber = licenseNumber;
+  }
+
+  const user = await User.create(userData);
+  return user;
+};
 
 const getMe = async (userId: string) => {
     const user = await User.findById(userId).select("-password");
