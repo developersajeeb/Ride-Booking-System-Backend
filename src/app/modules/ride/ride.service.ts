@@ -8,9 +8,9 @@ import { QueryBuilder } from '../../utils/QueryBuilder';
 import { rideSearchableFields } from './ride.constant';
 
 const requestRide = async (riderId: string, payload: Partial<IRide>) => {
-  const { pickupLocation, destination, distanceInKm } = payload;
+  const { pickupLocation, destination, distanceInKm, paymentMethod } = payload;
 
-  if (!pickupLocation || !destination || !distanceInKm) {
+  if (!pickupLocation || !destination || !distanceInKm || !paymentMethod) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Please check your inputs!');
   }
 
@@ -19,8 +19,13 @@ const requestRide = async (riderId: string, payload: Partial<IRide>) => {
     throw new AppError(httpStatus.FORBIDDEN, 'Only riders can request rides');
   }
 
+  const distance = parseFloat(distanceInKm as unknown as string);
+  if (isNaN(distance) || distance < 0.2 || distance > 250) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid distance value');
+  }
+
   const farePerKm = 20;
-  const totalFare = parseFloat((distanceInKm * farePerKm).toFixed(2));
+  const totalFare = parseFloat((distance * farePerKm).toFixed(2));
 
   const ride = await Ride.create({
     rider: riderId,
@@ -29,7 +34,8 @@ const requestRide = async (riderId: string, payload: Partial<IRide>) => {
     riderPhone: rider.phone,
     pickupLocation,
     destination,
-    distanceInKm,
+    distanceInKm: distance,
+    paymentMethod,
     fare: totalFare,
     status: 'REQUESTED',
     requestedAt: new Date(),
@@ -159,7 +165,7 @@ const updateRideStatus = async (driverId: string, rideId: string, status: 'PICKE
   if (status === 'COMPLETED' && ride.status !== 'IN_TRANSIT') {
     throw new AppError(httpStatus.BAD_REQUEST, 'Ride must be in transit to complete');
   }
-   if (status === 'COMPLETED') {
+  if (status === 'COMPLETED') {
     ride.completedAt = new Date();
   }
 

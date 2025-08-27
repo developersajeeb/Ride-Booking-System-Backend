@@ -30,4 +30,5 @@ export interface IRide {
   completedAt?: Date;
   cancelledAt?: Date;
   distanceInKm?: number;
+  paymentMethod: "cash" | "digital_payment";
 }
