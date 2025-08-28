@@ -20,7 +20,7 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: "User created successfully",
+    message: "Account created successfully",
     data: {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
@@ -79,23 +79,24 @@ const blockUnblockUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-//     const userId = req.params.id;
-//     const verifiedToken = req.user;
-//     const payload = req.body;
-//     const user = await UserServices.updateUser(userId, payload, verifiedToken as JwtPayload)
+const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userEmail = (req.user as JwtPayload).email;
+    const payload = req.body;
 
-//     sendResponse(res, {
-//         success: true,
-//         statusCode: httpStatus.CREATED,
-//         message: "User Updated Successfully",
-//         data: user,
-//     })
-// });
+    const user = await UserServices.updateUser(userEmail, payload);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User Updated Successfully",
+        data: user,
+    });
+});
 
 
 export const UserControllers = {
     createUser,
+    updateUser,
     getMe,
     getAllUsers,
     getSingleUser,

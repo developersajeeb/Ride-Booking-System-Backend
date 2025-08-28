@@ -86,37 +86,39 @@ const blockUnblockUser = async (userId: string, isBlocked: boolean) => {
   return user;
 };
 
-// const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload) => {
-//     const ifUserExist = await User.findById(userId);
+const updateUser = async (userEmail: string, payload: Partial<IUser>) => {
+    const ifUserExist = await User.findOne({ email: userEmail });
 
-//     if (!ifUserExist) {
-//         throw new AppError(httpStatus.NOT_FOUND, "User Not Found")
-//     }
+    if (!ifUserExist) {
+        throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+    }
+    const allowedFields: (keyof Pick<IUser, "name" | "phone" | "password">)[] = ["name", "phone", "password"];
+    const filteredPayload: Partial<IUser> = {};
 
-//     if (payload.role) {
-//         if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
-//             throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
-//         }
+    for (const key of allowedFields) {
+        if (payload[key] !== undefined) {
+            filteredPayload[key] = payload[key] as string;
+        }
+    }
 
-//         if (payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
-//             throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
-//         }
-//     }
-//     if (payload.isActive || payload.isDeleted || payload.isVerified) {
-//         if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
-//             throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
-//         }
-//     }
-//     if (payload.password) {
-//         payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SALT_ROUND)
-//     }
-//     const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true })
+    if (filteredPayload.password) {
+        filteredPayload.password = await bcryptjs.hash(
+            filteredPayload.password,
+            Number(envVars.BCRYPT_SALT_ROUND)
+        );
+    }
 
-//     return newUpdatedUser
-// }
+    const newUpdatedUser = await User.findOneAndUpdate({ email: userEmail }, filteredPayload, {
+        new: true,
+        runValidators: true,
+    });
+
+    return newUpdatedUser;
+};
 
 export const UserServices = {
     createUser,
+    updateUser,
     getMe,
     getAllUsers,
     getSingleUser,
