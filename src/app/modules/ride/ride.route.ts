@@ -14,5 +14,6 @@ router.patch('/:rideId/status', checkAuth(Role.DRIVER), RideControllers.updateRi
 router.get('/driver-history', checkAuth(Role.DRIVER), RideControllers.getDriverRideHistory);
 router.get('/rider-history', checkAuth(Role.RIDER), RideControllers.getRiderRideHistory);
 router.get('/all-rides', checkAuth(Role.ADMIN), RideControllers.getAllRides);
+router.get('/all-rides-for-driver', checkAuth(Role.DRIVER), RideControllers.getAllRides);
 
 export const RiderRoutes = router;
