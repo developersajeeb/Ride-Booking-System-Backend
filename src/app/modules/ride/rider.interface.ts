@@ -16,6 +16,7 @@ export interface IRide {
   riderName: string;
   riderEmail: string;
   riderPhone?: string;
+  vehicleType: 'car' | 'bike';
   pickupLocation: string;  
   destination: string;
   status: RideStatus;

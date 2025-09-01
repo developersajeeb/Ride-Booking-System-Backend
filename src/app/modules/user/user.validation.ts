@@ -13,8 +13,7 @@ export const createUserZodSchema = z.object({
   phone: z.string()
     .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
       message: 'Phone number must be valid for Bangladesh (01XXXXXXXXX)',
-    })
-    .optional(),
+    }),
   vehicleType: z.enum(["BIKE", "CAR", "OTHER"]).optional(),
   vehicleNumber: z.string().min(4).optional(),
   licenseNumber: z.string().min(4).optional(),

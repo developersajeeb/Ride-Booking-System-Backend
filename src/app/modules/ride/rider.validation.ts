@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
 export const requestRideZodSchema = z.object({
+  vehicleType: z.enum(["car", "bike"], {
+    required_error: "Vehicle type is required",
+    invalid_type_error: "Vehicle type must be either 'car' or 'bike'",
+  }),
   pickupLocation: z
     .string({ required_error: "Pickup location is required" })
     .min(2, "Pickup location must be at least 2 characters long"),

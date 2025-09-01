@@ -8,9 +8,9 @@ import { QueryBuilder } from '../../utils/QueryBuilder';
 import { rideSearchableFields } from './ride.constant';
 
 const requestRide = async (riderId: string, payload: Partial<IRide>) => {
-  const { pickupLocation, destination, distanceInKm, paymentMethod } = payload;
+  const { pickupLocation, destination, distanceInKm, paymentMethod, vehicleType } = payload;
 
-  if (!pickupLocation || !destination || !distanceInKm || !paymentMethod) {
+  if (!pickupLocation || !destination || !distanceInKm || !paymentMethod || !vehicleType) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Please check your inputs!');
   }
 
@@ -25,6 +25,7 @@ const requestRide = async (riderId: string, payload: Partial<IRide>) => {
   }
 
   const farePerKm = 20;
+
   const totalFare = parseFloat((distance * farePerKm).toFixed(2));
 
   const ride = await Ride.create({
@@ -36,6 +37,7 @@ const requestRide = async (riderId: string, payload: Partial<IRide>) => {
     destination,
     distanceInKm: distance,
     paymentMethod,
+    vehicleType,
     fare: totalFare,
     status: 'REQUESTED',
     requestedAt: new Date(),
@@ -109,7 +111,9 @@ const getRiderRideHistory = async (
   query: Record<string, string>
 ) => {
   const extendedQuery = { ...query, rider: riderId };
+
   const queryBuilder = new QueryBuilder(Ride.find(), extendedQuery);
+
   const ridesQuery = queryBuilder
     .filter()
     .sort()

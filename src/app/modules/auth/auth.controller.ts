@@ -26,6 +26,12 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
         if (user.role === "DRIVER") {
             await User.findOneAndUpdate({ email: user.email }, { onlineStatus: "online" });
         }
+
+        await User.findOneAndUpdate(
+            { email: user.email },
+            { onlineStatus: "online" }
+        );
+
         const userTokens = await createUserTokens(user)
         const { password: pass, ...rest } = user.toObject()
 
@@ -93,7 +99,12 @@ const setPassword = catchAsync(async (req: Request, res: Response, next: NextFun
 })
 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
+    const decodedUser = req.user as JwtPayload;
+    
+    if (decodedUser?.userId) {
+        await User.findByIdAndUpdate(decodedUser.userId, { onlineStatus: "offline" });
+    }
+    
     res.clearCookie("accessToken", {
         httpOnly: true,
         secure: false,

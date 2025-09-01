@@ -48,6 +48,11 @@ const rideSchema = new Schema<IRide>(
             type: String,
             required: false,
         },
+        vehicleType: {
+            type: String,
+            enum: ['car', 'bike'],
+            required: true,
+        },
         pickupLocation: {
             type: String,
             required: true,
