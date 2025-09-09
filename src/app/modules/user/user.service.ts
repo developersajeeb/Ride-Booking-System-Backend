@@ -27,11 +27,12 @@ const createUser = async (payload: Partial<IUser>) => {
     password: hashedPassword,
     role: role || "RIDER",
     auths: [authProvider],
+    onlineStatus: "online",
+    phone,
     ...rest,
   };
 
   if (role === "DRIVER") {
-    userData.phone = phone;
     userData.vehicleType = vehicleType;
     userData.vehicleNumber = vehicleNumber;
     userData.licenseNumber = licenseNumber;
